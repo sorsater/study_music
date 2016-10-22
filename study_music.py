@@ -5,14 +5,18 @@ import time
 from pprint import pprint
 import signal
 
-# -1 if no closing down
-sleeptime = 8
+# google_chrome folder
 folder = "study_music"
+
+# path to bookmarks file
 user = "michael"
 path = '/home/' + user + '/.config/google-chrome/Default/Bookmarks'
 
-# the links in the folder
-res = []
+# point to icon in the git folder
+icon = "/home/michael/Documents/gitworks/study_music/icon.png"
+
+def notify(title, message, icon):
+    os.system('notify-send -i ' + icon + ' "' + title + '" "' + message + '"')
 
 with open(path, 'r') as bm:
     data = json.load(bm)
@@ -20,20 +24,20 @@ with open(path, 'r') as bm:
 # print formatted json
 #pprint(data)
 
+# adds all the links to res
+res = []
 for i in data["roots"]["bookmark_bar"]["children"]:
     if(i["name"] == folder):
         for c in i["children"]:
             res.append([c["name"],c["url"]])
 
-print(len(res), " links in folder.")
+idx = random.randrange(len(res))
 
-vald = random.randrange(len(res))
-print("Opening: ", res[vald][0])
-os.system('google-chrome ' + res[vald][1])
+title = "Opening link"
+message = res[idx][0]
 
-if(sleeptime != -1):
-    for i in range(sleeptime):
-        print("Closing down:", sleeptime-i, "", end="\r")
-        time.sleep(1)
+notify(title, message, icon)
 
-    os.kill(os.getppid(), signal.SIGHUP)
+os.system('google-chrome ' + res[idx][1])
+time.sleep(2)
+os.kill(os.getppid(), signal.SIGHUP)
